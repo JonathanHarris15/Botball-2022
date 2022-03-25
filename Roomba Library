@@ -1,0 +1,236 @@
+
+void lock(int sleep){
+   
+    create_drive_direct(0,0);
+    msleep(sleep/2);
+    motor(0,0);
+    msleep(sleep/2);    
+}
+
+void forward(int speed,int distance)
+{
+    set_create_distance(0);
+    while(get_create_distance() > -distance)
+    {
+        create_drive_direct(-speed,-speed);   
+    }
+    lock(2);
+}
+
+void backward(int speed, int distance)
+{
+    set_create_distance(0);
+    while(get_create_distance() < distance)
+    {
+        
+        create_drive_direct(speed,speed);
+        
+    }
+    
+}
+
+void right(int deg,int speed)
+{
+    
+    set_create_normalized_angle(0);
+    while(get_create_normalized_angle() > -deg)
+    {
+        create_spin_CW(speed);
+    }
+}
+
+void left(int deg,int speed)
+{
+    
+    set_create_normalized_angle(0);
+    while(get_create_normalized_angle() < deg)
+    {
+        create_spin_CCW(speed);
+    }
+}
+//servo function by Jacob of Noble High School (written on August 8,2019)
+void servo(int port, int position, int speed){   
+    enable_servo(port);
+    int current = get_servo_position(port);
+
+    if(position > 2047){
+
+        position = 2047;
+
+    } 
+    if(position < 0){
+
+        position = 0;
+
+    }   
+
+    while(current <= position-speed || current >= position+speed){ 
+
+        if(current < position){
+
+            current += speed;
+           
+        }
+        if(current > position){
+
+            current -= speed;
+
+        }
+        set_servo_position(port, current);
+        msleep(2);
+    }
+
+    set_servo_position(port,position);
+    disable_servo(port);
+}
+void create_square_up(){
+    
+    int squarelspeed;
+    int squarerspeed;
+    //1600
+    while(get_create_lcliff_amt() > 2000 || get_create_rcliff_amt() > 2000){
+     
+        if(get_create_lcliff_amt() > 2000){
+            
+            squarelspeed = 100;
+            
+        }else{
+         
+            squarelspeed = 0;
+            
+        }
+        if(get_create_rcliff_amt() > 2000){
+         
+            squarerspeed = 100;
+            
+        }else{
+            
+            squarerspeed = 0;
+            
+        }
+        create_drive_direct(squarelspeed,squarerspeed);
+        
+        msleep(15);
+       printf("the cliff value for the left wheel is: %d \n",(get_create_rcliff_amt() - get_create_lcliff_amt()));
+    }
+    create_drive_direct(0,0);
+    msleep(10);
+}
+void create_square_up_back(){
+    
+    int squarelspeed;
+    int squarerspeed;
+    
+    while(get_create_lcliff_amt() > 1600 || get_create_rcliff_amt() > 1600){
+     
+        if(get_create_lcliff_amt() > 1600){
+            
+            squarelspeed = -100;
+            
+        }else{
+         
+            squarelspeed = 0;
+            
+        }
+        if(get_create_rcliff_amt() > 1600){
+         
+            squarerspeed = -100;
+            
+        }else{
+            
+            squarerspeed = 0;
+            
+        }
+        create_drive_direct(squarelspeed,squarerspeed);
+        
+        msleep(15);
+       printf("the cliff value for the left wheel is: %d \n",(get_create_rcliff_amt() - get_create_lcliff_amt()));
+    }
+    create_drive_direct(0,0);
+    msleep(10);
+}
+int bias;
+int right_wheel = 0;
+int left_wheel = 1;
+void line_follow(int port, int speed , int distance){
+	
+    set_create_distance(0);
+	int grey_value = 1151; //This grey value needs to be the average value that is directly between the read white value and the read black value of the tophat sensor
+	int speed_change;
+	cmpc(right_wheel);
+	int error = 0;  
+	while(get_create_distance() > -distance){
+		  error = grey_value-analog(port);
+		  speed_change= error*0.025;
+ 		  create_drive_direct(-speed + speed_change,-speed - speed_change);  
+	  }
+    	create_drive_direct(0, 0);
+   	msleep(100);
+} 
+void line_follow_till_cliff(int port, int speed){
+	
+    set_create_distance(0);
+	int grey_value = 1230; //This grey value needs to be the average value that is directly between the read white value and the read black value of the tophat sensor
+	int speed_change;
+	cmpc(right_wheel);
+	int error = 0;  
+	while(get_create_rcliff_amt() > 1600){
+		  error = grey_value-analog(port);
+		  speed_change= error*0.025;
+ 		  create_drive_direct(-speed + speed_change,-speed - speed_change);  
+	  }
+    	create_drive_direct(0, 0);
+   	msleep(100);
+}
+void line_follow2(int port, int speed , int distance){
+	
+    set_create_distance(0);
+	int grey_value = 1230; //This grey value needs to be the average value that is directly between the read white value and the read black value of the tophat sensor
+	int speed_change;
+	cmpc(right_wheel);
+	int error = 0;  
+	while(get_create_distance() > -distance){
+		  error = grey_value-analog(port);
+		  speed_change= error*0.025;
+ 		  create_drive_direct(speed - speed_change,speed + speed_change);  
+	  }
+    	create_drive_direct(0, 0);
+   	msleep(100);
+} 
+
+int get_create_rbump();
+
+void bump(int speed){
+    while (get_create_rbump() == 0){
+        create_drive_direct(speed, speed);
+    }
+    
+	create_drive_direct(0, 0);
+}
+
+int absolute(int input){
+ int val;
+    if(input > 0){
+        
+        val = input;
+        
+    }else if(input < 0){
+        
+        val = -input;
+        
+    }else{
+     
+        val = 0;
+        
+    }
+    
+    return val;
+}
+void move_mot(int port, int dist, int speed){
+    cmpc(port);
+    while(absolute(gmpc(port)) < dist){
+        motor(port,speed);
+    }
+    motor(port,0);
+    msleep(10);
+}
