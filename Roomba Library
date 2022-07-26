@@ -10,7 +10,8 @@ void lock(int sleep){
 void forward(int speed,int distance)
 {
     set_create_distance(0);
-    while(get_create_distance() > -distance)
+    int destination = get_create_distance() - distance;
+    while(get_create_distance() > destination)
     {
         create_drive_direct(-speed,-speed);   
     }
@@ -20,7 +21,8 @@ void forward(int speed,int distance)
 void backward(int speed, int distance)
 {
     set_create_distance(0);
-    while(get_create_distance() < distance)
+    int destination = get_create_distance() + distance;
+    while(get_create_distance() < destination)
     {
         
         create_drive_direct(speed,speed);
@@ -33,7 +35,8 @@ void right(int deg,int speed)
 {
     
     set_create_normalized_angle(0);
-    while(get_create_normalized_angle() > -deg)
+    int destination = get_create_normalized_angle() - deg;
+    while(get_create_normalized_angle() > destination)
     {
         create_spin_CW(speed);
     }
@@ -43,7 +46,8 @@ void left(int deg,int speed)
 {
     
     set_create_normalized_angle(0);
-    while(get_create_normalized_angle() < deg)
+    int destination = get_create_normalized_angle() + deg;
+    while(get_create_normalized_angle() < destination)
     {
         create_spin_CCW(speed);
     }
@@ -155,11 +159,12 @@ int left_wheel = 1;
 void line_follow(int port, int speed , int distance){
 	
     set_create_distance(0);
+    int destination = get_create_distance() - distance;
 	int grey_value = 1151; //This grey value needs to be the average value that is directly between the read white value and the read black value of the tophat sensor
 	int speed_change;
 	cmpc(right_wheel);
 	int error = 0;  
-	while(get_create_distance() > -distance){
+	while(get_create_distance() > destination){
 		  error = grey_value-analog(port);
 		  speed_change= error*0.025;
  		  create_drive_direct(-speed + speed_change,-speed - speed_change);  
@@ -185,11 +190,12 @@ void line_follow_till_cliff(int port, int speed){
 void line_follow2(int port, int speed , int distance){
 	
     set_create_distance(0);
+    int destination = get_create_distance() - distance;
 	int grey_value = 1230; //This grey value needs to be the average value that is directly between the read white value and the read black value of the tophat sensor
 	int speed_change;
 	cmpc(right_wheel);
 	int error = 0;  
-	while(get_create_distance() > -distance){
+	while(get_create_distance() > destination){
 		  error = grey_value-analog(port);
 		  speed_change= error*0.025;
  		  create_drive_direct(speed - speed_change,speed + speed_change);  
